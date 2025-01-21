@@ -1,5 +1,81 @@
 import { Request, Response } from 'express';
 import { FileUploadUseCase } from '../../../application/file/FileUploadUseCase';
+import { AppError } from '../../../shared/errors/AppError';
+
+/**
+ * @swagger
+ * /upload:
+ *   post:
+ *     summary: Upload file untuk task
+ *     description: Upload file dan lampirkan ke task tertentu
+ *     tags: [Files]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: File yang akan diupload (max 5MB)
+ *               taskId:
+ *                 type: string
+ *                 description: ID task yang akan dilampiri file
+ *             required:
+ *               - file
+ *               - taskId
+ *     responses:
+ *       200:
+ *         description: File berhasil diupload
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: file-123
+ *                     filename:
+ *                       type: string
+ *                       example: document.pdf
+ *                     mimetype:
+ *                       type: string
+ *                       example: application/pdf
+ *                     size:
+ *                       type: number
+ *                       example: 1048576
+ *                     taskId:
+ *                       type: string
+ *                       example: task-123
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 
 // Tipe data untuk request upload yang sudah terautentikasi
 interface AuthenticatedRequest extends Request {

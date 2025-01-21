@@ -8,6 +8,7 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`🚀 Server running at http://localhost:${PORT}`);
       console.log(`📈 GraphQL endpoint: http://localhost:${PORT}/graphql`);
+      console.log(`📈 REST API (upload file) endpoint: http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

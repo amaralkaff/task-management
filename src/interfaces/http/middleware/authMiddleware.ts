@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../../../shared/utils/token';
 import { AuthenticationError } from '../../../shared/errors/AppError';
+import { RequestHandler } from 'express';
 
 declare global {
   namespace Express {
@@ -14,11 +15,7 @@ declare global {
   }
 }
 
-export const authMiddleware = async (
-  req: Request,
-  _: Response,
-  next: NextFunction
-) => {
+export const authMiddleware: RequestHandler = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // Skip auth check for login and register mutations
@@ -30,12 +27,13 @@ export const authMiddleware = async (
   }
 
   if (!authHeader) {
-    return next(new AuthenticationError('Unauthorized'));
+    return res.status(401).json({ error: 'No authorization header' });
   }
 
   const [type, token] = authHeader.split(' ');
+
   if (type !== 'Bearer') {
-    return next(new AuthenticationError('Unauthorized'));
+    return res.status(401).json({ error: 'Invalid authorization type' });
   }
 
   try {
@@ -46,6 +44,6 @@ export const authMiddleware = async (
     };
     next();
   } catch (error) {
-    next(new AuthenticationError('Unauthorized'));
+    return res.status(401).json({ error: 'Invalid token' });
   }
 };

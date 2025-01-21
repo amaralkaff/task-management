@@ -10,6 +10,8 @@ API untuk manajemen tugas dengan fitur upload file dan autentikasi.
 - JWT untuk autentikasi
 - Jest untuk testing
 - Docker & Docker Compose untuk kontainerisasi
+- Swagger UI untuk dokumentasi REST API (Upload File)
+- GraphiQL untuk dokumentasi GraphQL
 
 ## Fitur
 
@@ -291,6 +293,11 @@ npm run test:coverage
 
 1. Get Tasks (dengan filter & pencarian):
 
+- Filter:
+  - filterByStatus: ["pending", "in_progress", "completed"]
+  - filterByDueDate: "YYYY-MM-DD"
+  - search: "keyword"
+
 ```graphql
 query GetTasks($filter: TaskFilterInput) {
   tasks(filter: $filter) {
@@ -311,10 +318,15 @@ query GetTasks($filter: TaskFilterInput) {
 # Variables (semua field opsional)
 {
   "filter": {
-    "filterByStatus": "pending",      # Filter berdasarkan status: ["pending", "in_progress", "completed"]
-    "filterByDueDate": "2024-03-20",  # Filter berdasarkan tanggal
-    "search": "keyword"               # Pencarian berdasarkan title/description
+    "filterByStatus": "pending",
+    "filterByDueDate": "2025-01-20",
+    "search": "task"
   }
+}
+
+# Authorization: Bearer <jwt_token>
+{
+  "Authorization": "Bearer jwt_token"
 }
 
 # Contoh Response
@@ -362,13 +374,34 @@ query GetTaskDetail($id: ID!) {
 
 # Variables
 {
-  "id": "task-123"
+  "id": "31b46fdb-1118-4406-a95b-b6d7ca59f9ee"
+}
+
+# Authorization: Bearer <jwt_token>
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+# Contoh Response
+{
+  "data": {
+    "task": {
+      "id": "31b46fdb-1118-4406-a95b-b6d7ca59f9ee",
+      "title": "Test Task",
+      "description": "Task Description",
+      "status": "pending",
+      "dueDate": "2024-03-20T00:00:00.000Z",
+    }
+  }
 }
 ```
 
 ### Mutations
 
 1. Register User:
+
+- Password harus mengandung huruf besar, kecil, dan angka
+- Minimal 8 karakter
 
 ```graphql
 mutation Register($input: RegisterInput!) {
@@ -386,8 +419,18 @@ mutation Register($input: RegisterInput!) {
 {
   "input": {
     "email": "user@example.com",
-    "password": "Password123!",  # Minimal 8 karakter, harus mengandung huruf besar, kecil, dan angka
+    "password": "Password123!",
     "name": "User Name"
+  }
+}
+
+# Contoh Response
+{
+  "data": {
+    "register": {
+      "token": "jwt_token",
+      "user": { "id": "user-id", "email": "user@example.com", "name": "User Name" }
+    }
   }
 }
 ```
@@ -413,9 +456,22 @@ mutation Login($input: LoginInput!) {
     "password": "Password123!"
   }
 }
+
+# Contoh Response
+{
+  "data": {
+    "login": {
+      "token": "jwt_token",
+      "user": { "id": "user-id", "email": "user@example.com", "name": "User Name" }
+    }
+  }
+}
 ```
 
 3. Create Task:
+
+- Header Authorization harus mengandung JWT token (Bearer <jwt_token>)
+- Status harus salah satu dari ["pending", "in_progress", "completed"]
 
 ```graphql
 mutation CreateTask($input: CreateTaskInput!) {
@@ -433,13 +489,35 @@ mutation CreateTask($input: CreateTaskInput!) {
   "input": {
     "title": "Task Title",
     "description": "Task Description",
-    "status": "pending",      # ["pending", "in_progress", "completed"]
+    "status": "pending",
     "dueDate": "2024-03-20"
+  }
+}
+
+# Authorization: Bearer <jwt_token>
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+# Contoh Response
+{
+  "data": {
+    "createTask": {
+      "id": "task-123",
+      "title": "Task Title",
+      "description": "Task Description",
+      "status": "pending",
+      "dueDate": "2024-03-20T00:00:00.000Z"
+    }
   }
 }
 ```
 
 4. Update Task:
+
+- ID task harus diisi => contohnya (31b46fdb-1118-4406-a95b-b6d7ca59f9ee)
+- Opsional: title, description, status, dueDate => Opsional karena tidak semua field harus diupdate
+- Status harus salah satu dari ["pending", "in_progress", "completed"]
 
 ```graphql
 mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
@@ -454,17 +532,38 @@ mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
 
 # Variables
 {
-  "id": "task-123",
+  "id": "31b46fdb-1118-4406-a95b-b6d7ca59f9ee",
   "input": {
-    "title": "Updated Task",        # Opsional
-    "description": "New desc",      # Opsional
-    "status": "in_progress",        # Opsional
-    "dueDate": "2024-03-21"        # Opsional
+    "title": "Updated Task",
+    "description": "New desc",
+    "status": "in_progress",
+    "dueDate": "2024-03-21"
+  }
+}
+
+# Authorization: Bearer <jwt_token>
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+# Contoh Response
+{
+  "data": {
+    "updateTask": {
+      "id": "task-123",
+      "title": "Updated Task",
+      "description": "New desc",
+      "status": "in_progress",
+      "dueDate": "2024-03-21T00:00:00.000Z"
+    }
   }
 }
 ```
 
-5. Delete Task:
+5. Delete Task: (soft delete)
+
+- ID task harus diisi => contohnya (31b46fdb-1118-4406-a95b-b6d7ca59f9ee)
+- Status task akan diubah menjadi "deleted" (tidak akan dihapus dari database)
 
 ```graphql
 mutation DeleteTask($id: ID!) {
@@ -473,16 +572,40 @@ mutation DeleteTask($id: ID!) {
 
 # Variables
 {
-  "id": "task-123"
+  "id": "31b46fdb-1118-4406-a95b-b6d7ca59f9ee"
+}
+
+# Authorization: Bearer <jwt_token>
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+# Contoh Response
+{
+  "data": {
+    "deleteTask": true
+  }
 }
 ```
 
-### File Upload
+**Mengapa REST API untuk Upload File?**
+
+> Untuk fitur upload file, dalam tes ini, saya menggunakan REST API meskipun aplikasi utamanya menggunakan GraphQL. Alasannya adalah sebagai berikut:
+> 1. **Performa yang lebih baik**: REST API memiliki dukungan asli untuk streaming data dan data formulir multipart sehingga lebih dioptimalkan untuk upload file biner.
+> 2. **Fitur Upload**: Saya akan memiliki kemungkinan lebih besar untuk mengupload progres yang ditampilkan pada saat diupload oleh pengguna saat mengupload data yang sangat besar melalui REST API.
+> 3. **Dukungan pada Tingkat Perpustakaan**: Sebagian besar library frontend pihak ketiga menangani upload implementasi file melalui REST API.
+> 4. **Mengikuti Norma Industri**: Dengan pengalaman pribadi dalam praktik menjadi developer, hal tersebut akan mudah diadopsi.
+>
+
+**Persyaratan:**
+
+- Pengguna harus masuk terlebih dahulu kemudian melanjutkan untuk mengupload.
+- Harus menyediakan token JWT melalui header Otorisasi (Bearer <jwt_token>)
 
 Untuk upload file ke task, gunakan endpoint REST berikut:
 
 ```bash
-POST /api/files/upload
+POST /upload
 ```
 
 Headers yang diperlukan:
@@ -503,31 +626,64 @@ Batasan upload file:
 - Format yang didukung: .txt, .pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png
 - Setiap task bisa memiliki multiple files
 
-Response sukses:
+**Cara Upload Menggunakan Swagger UI**
 
-```json
-{
-  "success": true,
-  "data": {
-    "id": "file-123",
-    "filename": "document.pdf",
-    "mimetype": "application/pdf",
-    "size": 1048576,
-    "taskId": "task-123"
-  }
-}
-```
+1. Buka Swagger UI di browser:
+   ```
+   http://localhost:4000/api-docs
+   ```
 
-## Error Handling
+2. Autentikasi:
+   - Klik tombol "Authorize" di bagian atas halaman
+   - Masukkan token JWT dengan format: `Bearer <jwt_token>`
+   - Klik "Authorize" untuk menyimpan token
 
-API menggunakan format error yang konsisten:
+3. Upload File:
+   - Cari endpoint `POST /upload` di daftar endpoint
+   - Klik untuk membuka detail endpoint
+   - Klik tombol "Try it out"
+   - Isi form yang muncul:
+     - `file`: Klik "Choose File" dan pilih file yang akan diupload
+     - `taskId`: Masukkan ID task yang valid
+   - Klik "Execute" untuk mengirim request
 
-```json
-{
-  "error": {
-    "message": "Error message", # Error message
-    "code": "ERROR_CODE", # ERROR_CODE: TASK_ID_REQUIRED, FILE_REQUIRED, UNAUTHORIZED, INTERNAL_SERVER_ERROR
-    "statusCode": 400, # 400, 401, 403, 404, 500
-  }
-}
-```
+4. Response yang Mungkin:
+
+   Sukses (200 OK):
+   ```json
+   {
+     "success": true,
+     "data": {
+       "id": "file-123",
+       "filename": "document.pdf",
+       "mimetype": "application/pdf",
+       "size": 1048576,
+       "taskId": "task-123"
+     }
+   }
+   ```
+
+   Error Response akan otomatis ditampilkan di bagian "Response" jika terjadi kesalahan.
+
+Batasan Upload:
+- Maksimal ukuran: 5MB
+- Format yang didukung: .txt, .pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png
+- Setiap task bisa memiliki multiple files
+
+## Dokumentasi API
+
+### Dokumentasi REST API
+Swagger UI dapat diakses melalui: http://localhost:4000/api-docs
+- Berisi dokumentasi lengkap untuk semua endpoint REST API
+- Dilengkapi fitur uji coba langsung untuk mencoba endpoint
+- Sistem autentikasi menggunakan token Bearer
+- Penjelasan lengkap format permintaan dan respons
+- Daftar kode error beserta penanganannya
+
+### Playground GraphQL
+GraphQL Playground dapat diakses melalui: http://localhost:4000/graphql
+- IDE GraphQL yang interaktif untuk mencoba API
+- Fitur untuk menguji query dan mutation secara langsung
+- Eksplorasi skema API yang tersedia
+- Riwayat permintaan yang pernah dilakukan
+- Pengaturan header autentikasi yang mudah

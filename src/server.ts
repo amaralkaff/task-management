@@ -7,6 +7,8 @@ import { createResolvers } from './interfaces/graphql/resolvers/index';
 import { authMiddleware } from './interfaces/http/middleware/authMiddleware';
 import { errorHandler } from './interfaces/http/middleware/errorHandler';
 import { upload } from './interfaces/http/middleware/upload';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './shared/config/swagger';
 
 // Repositories
 import { MySQLUserRepository } from './infrastructure/persistence/mysql/MySQLUserRepository';
@@ -146,6 +148,153 @@ export async function createServer(): Promise<Express> {
   // Middleware
   app.use(cors());
   app.use(express.json());
+
+  // Swagger UI
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+  // GraphQL Schema Documentation
+  app.get('/graphql-docs', (_, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Task Management API - GraphQL Documentation</title>
+        <script src="https://cdn.jsdelivr.net/npm/graphql-voyager/dist/voyager.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/graphql-voyager/dist/voyager.css" />
+        <style>
+          body { height: 100vh; margin: 0; }
+          #voyager { height: 100%; }
+        </style>
+      </head>
+      <body>
+        <div id="voyager">Loading...</div>
+        <script>
+          const voyager = new window.GraphQLVoyager.Voyager({
+            introspection: async () => {
+              const response = await fetch('/graphql', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  query: \`
+                    query IntrospectionQuery {
+                      __schema {
+                        queryType { name }
+                        mutationType { name }
+                        types {
+                          ...FullType
+                        }
+                      }
+                    }
+                    fragment FullType on __Type {
+                      kind
+                      name
+                      description
+                      fields(includeDeprecated: true) {
+                        name
+                        description
+                        args {
+                          ...InputValue
+                        }
+                        type {
+                          ...TypeRef
+                        }
+                        isDeprecated
+                        deprecationReason
+                      }
+                      inputFields {
+                        ...InputValue
+                      }
+                      interfaces {
+                        ...TypeRef
+                      }
+                      enumValues(includeDeprecated: true) {
+                        name
+                        description
+                        isDeprecated
+                        deprecationReason
+                      }
+                      possibleTypes {
+                        ...TypeRef
+                      }
+                    }
+                    fragment InputValue on __InputValue {
+                      name
+                      description
+                      type { ...TypeRef }
+                      defaultValue
+                    }
+                    fragment TypeRef on __Type {
+                      kind
+                      name
+                      ofType {
+                        kind
+                        name
+                        ofType {
+                          kind
+                          name
+                          ofType {
+                            kind
+                            name
+                            ofType {
+                              kind
+                              name
+                              ofType {
+                                kind
+                                name
+                                ofType {
+                                  kind
+                                  name
+                                  ofType {
+                                    kind
+                                    name
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  \`
+                })
+              });
+              return response.json();
+            },
+            workerURI: 'https://cdn.jsdelivr.net/npm/graphql-voyager/dist/voyager.worker.min.js',
+            displayOptions: {
+              skipRelay: false,
+              skipDeprecated: false,
+              showLeafFields: true,
+            },
+          });
+          document.getElementById('voyager').innerHTML = '';
+          voyager.renderTo('#voyager');
+        </script>
+      </body>
+      </html>
+    `);
+  });
+
+  // Konfigurasi timeout dan keep-alive
+  app.use((req, res, next) => {
+    // Meningkatkan timeout
+    req.setTimeout(30000);
+    res.setTimeout(30000);
+    
+    // Menambahkan header keep-alive
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Keep-Alive', 'timeout=30');
+    
+    next();
+  });
+
+  // Menangani kasus koneksi terputus
+  app.use((req, res, next) => {
+    req.on('close', () => {
+      // Clean up resources if needed
+    });
+    next();
+  });
 
   // Initialize all dependencies
   const dependencies = initializeDependencies();
