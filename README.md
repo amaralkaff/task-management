@@ -62,8 +62,8 @@ src/
 2. Clone repository
 
    ```bash
-   git clone <repository-url>
-   cd task-management-api
+   git clone https://github.com/amaralkaff/task-management.git
+   cd task-management
    ```
 
 3. Build dan jalankan container
