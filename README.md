@@ -132,8 +132,7 @@ Struktur Docker:
 1. Clone repository
 
 ```bash
-git clone <repository-url>
-cd task-management-api
+git clone https://github.com/amaralkaff/task-management cd task-management
 ```
 
 2. Install dependencies
