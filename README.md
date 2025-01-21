@@ -46,6 +46,8 @@ src/
 ├── __tests__/          # Tests
 │   ├── unit/
 │   └── integration/
+├── index.ts            # Entry point
+├── server.ts           # Server setup
 ```
 
 ## Setup Development
@@ -131,44 +133,61 @@ Struktur Docker:
 
 1. Clone repository
 
-```bash
-git clone https://github.com/amaralkaff/task-management cd task-management
-```
+  ```bash
+  git clone https://github.com/amaralkaff/task-management 
+  cd task-management
+  ```
 
 2. Install dependencies
 
-```bash
-npm install
-```
+  ```bash
+  npm install
+  ```
 
 3. Setup environment variables
 
-```bash
-cp .env.example .env
-```
+  ```bash
+  cp .env.example .env
+  ```
 
 Sesuaikan nilai-nilai berikut di file `.env`:
 
-```
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASS=root
-DB_NAME=task_management_api_baru
-JWT_SECRET=your-secret-key
-```
+  ```
+  # Server
+  PORT=4000
+  NODE_ENV=development
+
+  # Database
+  DB_HOST=localhost
+  DB_PORT=3306
+  DB_USER=root
+  DB_PASS=root
+  DB_NAME=task_management_api
+
+  # JWT
+  JWT_SECRET=rahasia
+
+  # File Upload
+  UPLOAD_DIR=uploads
+  MAX_FILE_SIZE=5242880
+  ```
 
 4. Jalankan database migrations
 
-```bash
-npm run migrate
-```
+  ```bash
+  npm run migrate
+  ```
 
 5. Jalankan development server
 
-```bash
-npm run dev
-```
+  ```bash
+  npm run dev
+  ```
+
+Aplikasi akan tersedia di:
+
+- GraphQL Playground: http://localhost:4000/graphql 
+- REST API (upload file) endpoint: http://localhost:4000/api-docs
 
 ## Testing
 

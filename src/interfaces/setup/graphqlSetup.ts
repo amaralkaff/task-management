@@ -1,3 +1,4 @@
+// src/interfaces/setup/graphqlSetup.ts
 import { Express } from 'express';
 import { createYoga } from 'graphql-yoga';
 import { makeExecutableSchema } from '@graphql-tools/schema';

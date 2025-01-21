@@ -1,3 +1,4 @@
+// src/__tests__/unit/password.test.ts
 import { hashPassword, comparePasswords } from '../../shared/utils/password';
 
 describe('Password Utils', () => {

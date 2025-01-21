@@ -1,3 +1,4 @@
+// src/__tests__/unit/UserUseCase.test.ts
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { AuthUseCase } from '../../application/auth/AuthUseCase';
 import { User } from '../../domain/entities/User';

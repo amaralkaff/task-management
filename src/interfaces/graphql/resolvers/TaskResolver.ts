@@ -1,5 +1,4 @@
 // src/interfaces/graphql/resolvers/TaskResolver.ts
-import { GraphQLError } from 'graphql';
 import { TaskUseCase } from '../../../application/task/TaskUseCase';
 import { Context } from '../types/context';
 import { AuthenticationError } from '../../../shared/errors/AppError';

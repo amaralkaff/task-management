@@ -1,5 +1,4 @@
 // src/domain/services/AuthService.ts
-import { User } from '../entities/User';
 
 export interface TokenPayload {
   userId: string;

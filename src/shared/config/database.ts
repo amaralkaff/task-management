@@ -25,7 +25,6 @@ if (process.env.NODE_ENV !== 'test') {
     })
     .catch((err) => {
       console.error('❌ Gagal terhubung ke database:', err.message);
-      // Jangan exit process di environment development
       if (process.env.NODE_ENV === 'production') {
         process.exit(1);
       }

@@ -1,3 +1,4 @@
+// src/__tests__/unit/UserResolver.test.ts
 import { UserResolver } from '../../interfaces/graphql/resolvers/UserResolver';
 import { AuthenticationError } from '../../shared/errors/AppError';
 import { User } from '../../domain/entities/User';

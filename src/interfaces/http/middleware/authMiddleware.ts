@@ -1,7 +1,5 @@
 // src/interfaces/http/middleware/authMiddleware.ts
-import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../../../shared/utils/token';
-import { AuthenticationError } from '../../../shared/errors/AppError';
 import { RequestHandler } from 'express';
 
 declare global {

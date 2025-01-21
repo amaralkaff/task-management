@@ -1,3 +1,4 @@
+// src/interfaces/setup/fileUploadSetup.ts
 import { Express } from 'express';
 import { authMiddleware } from '../http/middleware/authMiddleware';
 import { upload } from '../http/middleware/upload';

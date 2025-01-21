@@ -1,3 +1,4 @@
+// src/index.ts
 import { createServer } from './server';
 
 async function startServer() {

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { FileUploadUseCase } from '../../../application/file/FileUploadUseCase';
-import { AppError } from '../../../shared/errors/AppError';
 
 /**
  * @swagger

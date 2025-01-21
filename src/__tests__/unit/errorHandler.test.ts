@@ -1,3 +1,4 @@
+// src/__tests__/unit/errorHandler.test.ts
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { AuthenticationError } from '../../shared/errors/AppError';

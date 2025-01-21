@@ -1,3 +1,4 @@
+// src/__tests__/setup.ts
 import dotenv from 'dotenv';
 import { pool } from '../shared/config/database';
 import { beforeAll, afterAll } from '@jest/globals';

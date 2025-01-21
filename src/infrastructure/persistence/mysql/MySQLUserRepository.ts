@@ -2,7 +2,6 @@
 import { User } from '../../../domain/entities/User';
 import { UserRepository } from '../../../domain/repositories/UserRepository';
 import { pool } from '../../../shared/config/database';
-import { NotFoundError } from '../../../shared/errors/AppError';
 
 export class MySQLUserRepository implements UserRepository {
   async findById(id: string): Promise<User | null> {

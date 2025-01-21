@@ -1,5 +1,4 @@
 // src/domain/entities/File.ts
-import { Entity } from './Entity';
 
 export class File {
   constructor(
