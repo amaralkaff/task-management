@@ -6,38 +6,43 @@ services:
     ports:
       - "4000:4000"
     environment:
-      - NODE_ENV=development
       - DB_HOST=mysql
-      - DB_PORT=3306
       - DB_USER=root
       - DB_PASS=root
       - DB_NAME=task_management_api
+      - PORT=4000
+      - NODE_ENV=development
       - JWT_SECRET=rahasia
       - UPLOAD_DIR=uploads
       - MAX_FILE_SIZE=5242880
     volumes:
       - ./uploads:/app/uploads
+      - ./src:/app/src
     depends_on:
       mysql:
         condition: service_healthy
-    restart: unless-stopped
+    command: >
+      sh -c "
+        echo 'Running migrations...' &&
+        node --experimental-specifier-resolution=node --es-module-specifier-resolution=node dist/infrastructure/persistence/migrations/runMigrations.js &&
+        echo 'Migrations completed. Starting server...' &&
+        node --experimental-specifier-resolution=node --es-module-specifier-resolution=node dist/index.js
+      "
 
   mysql:
     image: mysql:8.0
-    ports:
-      - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=task_management_api
+    ports:
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-      interval: 2s
-      timeout: 2s
-      retries: 3
-      start_period: 5s
-    restart: unless-stopped
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mysql_data: 

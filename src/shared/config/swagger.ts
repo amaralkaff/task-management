@@ -1,11 +1,12 @@
 // src/shared/config/swagger.ts
 import swaggerJsdoc from 'swagger-jsdoc';
+import { AppError } from '../errors/AppError';
 
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Task Management API Documentation',
+      title: 'Task Management API Documentation', 
       version: '1.0.0',
       description: 'Dokumentasi API untuk Task Management System',
     },
@@ -17,37 +18,6 @@ const options = {
     ],
     components: {
       schemas: {
-        Error: {
-          type: 'object',
-          properties: {
-            success: {
-              type: 'boolean',
-              example: false,
-            },
-            error: {
-              type: 'object',
-              properties: {
-                message: {
-                  type: 'string',
-                  description: 'Pesan error yang spesifik',
-                  example: 'Task tidak ditemukan',
-                },
-                code: {
-                  type: 'string',
-                  description: 'Kode error',
-                  example: 'TASK_NOT_FOUND',
-                },
-                statusCode: {
-                  type: 'integer',
-                  description: 'HTTP status code',
-                  enum: [400, 401, 403, 404, 409, 422, 500],
-                  example: 404,
-                },
-              },
-              required: ['message', 'code', 'statusCode'],
-            },
-          },
-        },
         FileUploadResponse: {
           type: 'object',
           properties: {
@@ -68,7 +38,7 @@ const options = {
                 },
                 mimetype: {
                   type: 'string',
-                  example: 'application/pdf',
+                  example: 'application/pdf', 
                 },
                 size: {
                   type: 'number',
@@ -82,7 +52,7 @@ const options = {
             },
           },
         },
-        BadRequestError: {
+        AppError: {
           type: 'object',
           properties: {
             success: {
@@ -94,72 +64,65 @@ const options = {
               properties: {
                 message: {
                   type: 'string',
-                  example: 'File terlalu besar (max 5MB) atau format file tidak didukung',
+                  example: 'Task tidak ditemukan',
                 },
                 code: {
                   type: 'string',
-                  example: 'INVALID_FILE',
+                  example: 'TASK_NOT_FOUND',
                 },
                 statusCode: {
                   type: 'integer',
-                  example: 400,
+                  example: 404,
                 },
+                details: {
+                  type: 'object',
+                  example: null,
+                  description: 'Informasi tambahan tentang error (opsional)'
+                }
               },
+              required: ['message', 'code', 'statusCode'],
             },
           },
+        },
+        BadRequestError: {
+          allOf: [
+            { $ref: '#/components/schemas/AppError' }
+          ],
+          example: {
+            success: false,
+            error: {
+              message: 'Data yang diberikan tidak valid',
+              code: 'INVALID_INPUT',
+              statusCode: 400
+            }
+          }
         },
         UnauthorizedError: {
-          type: 'object',
-          properties: {
-            success: {
-              type: 'boolean',
-              example: false,
-            },
+          allOf: [
+            { $ref: '#/components/schemas/AppError' }
+          ],
+          example: {
+            success: false,
             error: {
-              type: 'object',
-              properties: {
-                message: {
-                  type: 'string',
-                  example: 'Anda harus login terlebih dahulu',
-                },
-                code: {
-                  type: 'string',
-                  example: 'UNAUTHORIZED',
-                },
-                statusCode: {
-                  type: 'integer',
-                  example: 401,
-                },
-              },
-            },
-          },
+              message: 'Token tidak valid atau kadaluarsa',
+              code: 'INVALID_TOKEN',
+              statusCode: 401
+            }
+          }
         },
         InternalServerError: {
-          type: 'object',
-          properties: {
-            success: {
-              type: 'boolean',
-              example: false,
-            },
+          allOf: [
+            { $ref: '#/components/schemas/AppError' }
+          ],
+          example: {
+            success: false,
             error: {
-              type: 'object',
-              properties: {
-                message: {
-                  type: 'string',
-                  example: 'Gagal menyimpan file ke storage',
-                },
-                code: {
-                  type: 'string',
-                  example: 'STORAGE_ERROR',
-                },
-                statusCode: {
-                  type: 'integer',
-                  example: 500,
-                },
-              },
-            },
-          },
-        },
+              message: 'Terjadi kesalahan internal server',
+              code: 'INTERNAL_SERVER_ERROR',
+              statusCode: 500
+            }
+          }
+        }
       },
       securitySchemes: {
         BearerAuth: {

@@ -33,47 +33,25 @@ import { FileUploadUseCase } from '../../../application/file/FileUploadUseCase';
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: file-123
- *                     filename:
- *                       type: string
- *                       example: document.pdf
- *                     mimetype:
- *                       type: string
- *                       example: application/pdf
- *                     size:
- *                       type: number
- *                       example: 1048576
- *                     taskId:
- *                       type: string
- *                       example: task-123
+ *               $ref: '#/components/schemas/FileUploadResponse'
  *       400:
  *         description: Bad Request
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
+ *               $ref: '#/components/schemas/BadRequestError'
  *       401:
  *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
+ *               $ref: '#/components/schemas/UnauthorizedError'
  *       500:
  *         description: Internal Server Error
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
+ *               $ref: '#/components/schemas/InternalServerError'
  */
 
 // Tipe data untuk request upload yang sudah terautentikasi

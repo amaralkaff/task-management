@@ -18,6 +18,10 @@ COPY src ./src
 # Build TypeScript
 RUN npm run build
 
+# Salin file SQL migrasi ke folder dist
+RUN mkdir -p dist/infrastructure/persistence/migrations && \
+    cp src/infrastructure/persistence/migrations/*.sql dist/infrastructure/persistence/migrations/
+
 # Tahap Production
 FROM node:18-alpine
 
